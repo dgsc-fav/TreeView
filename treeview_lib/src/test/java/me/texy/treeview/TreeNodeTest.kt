@@ -46,11 +46,23 @@ class TreeNodeTest {
         override val pinned: Boolean = false
     }
 
+    class CategoryValues(override val level: Int = 2) : Category<String> {
+        override fun toString(): String {
+            return "CategoryValues"
+        }
+
+        override fun asKey(): Any {
+            return toString()
+        }
+
+        override val pinned: Boolean = false
+    }
+
     @Test
     fun testAddToTree() {
 
         val categoriesHolder = object : CategoriesHolder<String> {
-            override val categoriesByPriority: Array<Category<String>> = arrayOf(CategoryTime(), CategorySeverity())
+            override val categoriesByPriority: Array<Category<String>> = arrayOf(CategoryTime(), CategorySeverity(), CategoryValues())
         }
 
         val itemNullHigh = ValuesSetImpl(null, "high", "item_null_high")
