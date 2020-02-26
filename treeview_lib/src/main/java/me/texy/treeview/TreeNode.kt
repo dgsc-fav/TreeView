@@ -17,33 +17,6 @@ import me.texy.treeview.helper.TreeHelper
 import java.util.ArrayList
 import java.util.LinkedList
 
-/**
- * Created by xinyuanzhong on 2017/4/20.
- * Dmitry Korchagin. 24.02.2020
- */
-
-interface Category<V> : Comparable<Category<V>> {
-    val level: Int
-
-    val pinned: Boolean
-
-    override fun compareTo(other: Category<V>): Int {
-        return level.compareTo(other.level)
-    }
-
-    fun asKey(): Any
-}
-
-interface ValuesSet<V, C> {
-    fun getValueForCategory(category: Category<C>): C?
-
-    val value: V
-}
-
-interface CategoriesHolder<C> {
-    val categoriesByPriority: Array<Category<C>>
-}
-
 class TreeNode<V, C>(
         // a parent item for this item. may be null if it is a root item
         var parent: TreeNode<V, C>? = null,
@@ -53,19 +26,17 @@ class TreeNode<V, C>(
     var category: Category<C>? = null
     var categoryValue: C? = null
 
-    var childCategory: Category<C>? = null
+    private var childCategory: Category<C>? = null
     // list of children. may be null if no children presented for a category (? this might not been happened) or for an item
     private var children: MutableList<TreeNode<V, C>>? = null
 
-    @Deprecated("Category")
-    var level: Int = 0
-    get() {
-       return category?.level ?: 2
-    }
+    val level: Int
+        get() = category?.level ?: -1
 
     var index = 0
     var isExpanded = false
     var isSelected = false
+
     var isItemClickEnable = true
 
     fun addChild(treeNode: TreeNode<V, C>?) {
@@ -92,7 +63,7 @@ class TreeNode<V, C>(
                 return false
             }
             val children: List<TreeNode<V, C>> = parent!!.getChildren()
-            return children.size > 0 && children.indexOf(this) == children.size - 1
+            return children.isNotEmpty() && children.indexOf(this) == children.size - 1
         }
 
     val isRoot: Boolean
@@ -144,7 +115,7 @@ class TreeNode<V, C>(
     var isGroup: Boolean = false
 
     fun hasChild(): Boolean {
-        return children!!.size > 0
+        return !children.isNullOrEmpty()
     }
 
     val id: String
@@ -153,16 +124,9 @@ class TreeNode<V, C>(
     companion object {
         @JvmStatic
         fun <V, C> root(): TreeNode<V, C> {
-            return TreeNode()
+            return TreeNode<V, C>()
         }
     }
-
-    init {
-        children = LinkedList()
-    }
-
-    ////////////////
-
 
     override fun toString(): String {
         return if (valuesSet != null) {
@@ -180,28 +144,12 @@ class TreeNode<V, C>(
         return sb.toString()
     }
 
-
-
-    private fun insertValueSet(valuesSet: ValuesSet<V, C>, parent: TreeNode<V, C>): TreeNode<V, C> {
-        if (parent.children == null) {
-            parent.children = LinkedList()
-        }
-
-        val leaf = TreeNode<V, C>().apply {
-            this.parent = parent
-            this.valuesSet = valuesSet
-        }
-
-        parent.children!!.add(leaf)
-        return leaf
-    }
-
     fun add(valuesSet: ValuesSet<V, C>, categoriesHolder: CategoriesHolder<C>): TreeNode<V, C>? {
 
         // as mentioned above, we use the filesystem behaviour - firstly make all the folders next add a file to the last folder
         // from highest priority category to the lowest
 
-        if (this.parent != null) throw IllegalAccessException("This is not a root")
+        if (!isRoot) throw IllegalAccessException("This is not a root")
 
         var currNode: TreeNode<V, C> = this
 
@@ -264,11 +212,12 @@ class TreeNode<V, C>(
                 // node not found. do make it
                 childNodeByCategoryValue = TreeNode<V, C>().apply {
                     parent = node
-                    category = node.childCategory
+                    category = node.childCategory!!
                     categoryValue = valueForCategory
-                    childCategory = nextCategory
-                    children = LinkedList()
+//                    childCategory = nextCategory
+//                    children = LinkedList()
                     isGroup = true
+
                     if (forCategory.pinned) {
                         isExpanded = true
                         isItemClickEnable = false
@@ -302,30 +251,47 @@ class TreeNode<V, C>(
         }
     }
 
-    fun toMap() : Any? {
+    /**
+     * Insert a new child node
+     */
+    private fun insertValueSet(valuesSet: ValuesSet<V, C>, parent: TreeNode<V, C>): TreeNode<V, C> {
+//        if (parent.children == null) {
+//            parent.children = LinkedList()
+//        }
+
+        val leaf = TreeNode<V, C>().apply {
+            this.category = parent.childCategory!!
+            this.parent = parent
+            this.valuesSet = valuesSet
+        }
+
+        parent.children!!.add(leaf)
+        return leaf
+    }
+
+    fun toMap(): Any? {
         val map = mutableMapOf<Any, Any>()
 
         val keyCategory = category?.asKey()?.toString()
         val keyCategoryValue = categoryValue?.toString()
 
-
         val childrenList = children?.map { it.toMap() }
 
         val key = keyCategoryValue
 
-        if (key == null) {
-            if (childrenList != null) {
-                return childrenList
-            } else if (valuesSet != null) {
-                return valuesSet!!
-            }
-        } else {
+        if (key != null) {
             keyCategory?.let { map["type"] = it }
 
             if (childrenList != null) {
                 map[key] = childrenList
             } else if (valuesSet != null) {
                 map[key] = valuesSet!!
+            }
+        } else {
+            if (childrenList != null) {
+                return childrenList
+            } else if (valuesSet != null) {
+                return valuesSet!!
             }
         }
 

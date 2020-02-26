@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/add_value"
+        android:orderInCategory="200"
+        android:title="Add value"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/expand_all"
         android:orderInCategory="200"
         android:title="Expand All"

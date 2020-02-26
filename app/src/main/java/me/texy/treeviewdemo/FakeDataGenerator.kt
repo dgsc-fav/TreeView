@@ -1,6 +1,5 @@
 package me.texy.treeviewdemo
 
-import com.google.gson.Gson
 import me.texy.treeview.CategoriesHolder
 import me.texy.treeview.Category
 import me.texy.treeview.TreeNode
@@ -50,12 +49,23 @@ object FakeDataGenerator {
         override val pinned: Boolean = false
     }
 
-    fun buildTree(root: TreeNode<String, String>) {
-
-        val categoriesHolder = object : CategoriesHolder<String> {
-            override val categoriesByPriority: Array<Category<String>> = arrayOf(CategoryTime(), CategorySeverity())
+    class CategoryValues(override val level: Int = 2) : Category<String> {
+        override fun toString(): String {
+            return "CategoryValues"
         }
 
+        override fun asKey(): Any {
+            return toString()
+        }
+
+        override val pinned: Boolean = false
+    }
+
+    val categoriesHolder = object : CategoriesHolder<String> {
+        override val categoriesByPriority: Array<Category<String>> = arrayOf(CategoryTime(), CategorySeverity(), CategoryValues())
+    }
+
+    fun buildTree(root: TreeNode<String, String>) {
         val item_null_high = ValuesSetImpl(null, "high", "item_null_high")
         val item_0_high = ValuesSetImpl("123", "high", "item_123_high")
         val item_0_low = ValuesSetImpl("123", "low", "item_123_low")
@@ -72,8 +82,14 @@ object FakeDataGenerator {
         root.add(item_1_low, categoriesHolder)
         root.add(item_2_null, categoriesHolder)
 
-        val map2 = root.toMap()
-        val json2 = Gson().toJson(map2)
-        println(json2)
+//        val map2 = root.toMap()
+//        val json2 = Gson().toJson(map2)
+//        println(json2)
     }
+
+    fun runtimeAppendValueToTree(root: TreeNode<String, String>): TreeNode<String, String>? {
+        val item_0_high = ValuesSetImpl("123", "high", "item_123_high")
+        return root.add(item_0_high, categoriesHolder)
+    }
+
 }

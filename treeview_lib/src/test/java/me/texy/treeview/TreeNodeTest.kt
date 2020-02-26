@@ -8,8 +8,6 @@ class TreeNodeTest {
     class ValuesSetImpl(val categoryTimeValue: String?, val categorySeverityValue: String?, override val value: String = "value") : ValuesSet<String, String> {
 
         override fun getValueForCategory(category: Category<String>): String? {
-            //println("getValueForCategory: $category")
-
             return when (category) {
                 is CategoryTime -> categoryTimeValue
                 is CategorySeverity -> categorySeverityValue

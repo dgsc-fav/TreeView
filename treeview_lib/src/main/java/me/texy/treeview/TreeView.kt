@@ -31,7 +31,12 @@ import me.texy.treeview.helper.TreeHelper.selectNodeAndChild
 /**
  * Created by xinyuanzhong on 2017/4/20.
  */
-class TreeView<V, C>(private val root: TreeNode<V, C>, private val context: Context, private val baseNodeViewFactory: BaseNodeViewFactory<V, C>) : SelectableTreeAction<V, C> {
+class TreeView<V, C>(
+        private val context: Context,
+        private val root: TreeNode<V, C>,
+        private val baseNodeViewFactory: BaseNodeViewFactory<V, C>,
+        private val showEmptyNode: Boolean = false,
+        private val onTreeNodeClickListener: TreeViewAdapter.OnTreeNodeClickListener<V, C>? = null) : SelectableTreeAction<V, C> {
 
     private var rootView: RecyclerView? = null
     private var adapter: TreeViewAdapter<V, C>? = null
@@ -54,8 +59,7 @@ class TreeView<V, C>(private val root: TreeNode<V, C>, private val context: Cont
         recyclerView.isMotionEventSplittingEnabled = false
         (recyclerView.itemAnimator as SimpleItemAnimator?)!!.supportsChangeAnimations = false
         recyclerView.layoutManager = LinearLayoutManager(context)
-        adapter = TreeViewAdapter<V, C>(context, root, baseNodeViewFactory, false)
-        adapter!!.setTreeView(this)
+        adapter = TreeViewAdapter<V, C>(context, this, root, baseNodeViewFactory, showEmptyNode, onTreeNodeClickListener)
         recyclerView.adapter = adapter
         return recyclerView
     }
@@ -66,19 +70,15 @@ class TreeView<V, C>(private val root: TreeNode<V, C>, private val context: Cont
     }
 
     fun refreshTreeView() {
-        if (rootView != null) {
-            (rootView!!.adapter as TreeViewAdapter<V, C>?)!!.refreshView()
-        }
+        (adapter as? TreeViewAdapter<V, C>)?.refreshView()
     }
 
     fun updateTreeView() {
-        if (rootView != null) {
-            rootView!!.adapter!!.notifyDataSetChanged()
-        }
+        adapter?.notifyDataSetChanged()
     }
 
     override fun expandNode(treeNode: TreeNode<V, C>?) {
-        adapter!!.expandNode(treeNode)
+        adapter?.expandNode(treeNode)
     }
 
     override fun expandLevel(level: Int) {
@@ -92,7 +92,7 @@ class TreeView<V, C>(private val root: TreeNode<V, C>, private val context: Cont
     }
 
     override fun collapseNode(treeNode: TreeNode<V, C>?) {
-        adapter!!.collapseNode(treeNode)
+        adapter?.collapseNode(treeNode)
     }
 
     override fun collapseLevel(level: Int) {
@@ -111,7 +111,7 @@ class TreeView<V, C>(private val root: TreeNode<V, C>, private val context: Cont
     }
 
     override fun deleteNode(node: TreeNode<V, C>?) {
-        adapter!!.deleteNode(node)
+        adapter?.deleteNode(node)
     }
 
     override fun addNode(parent: TreeNode<V, C>?, treeNode: TreeNode<V, C>?) {
@@ -126,13 +126,13 @@ class TreeView<V, C>(private val root: TreeNode<V, C>, private val context: Cont
 
     override fun selectNode(treeNode: TreeNode<V, C>?) {
         if (treeNode != null) {
-            adapter!!.selectNode(true, treeNode)
+            adapter?.selectNode(true, treeNode)
         }
     }
 
     override fun deselectNode(treeNode: TreeNode<V, C>?) {
         if (treeNode != null) {
-            adapter!!.selectNode(false, treeNode)
+            adapter?.selectNode(false, treeNode)
         }
     }
 

@@ -20,11 +20,7 @@ class FirstLevelNodeViewBinder(itemView: View) : CheckableNodeViewBinder<String,
     override fun bindView(treeNode: TreeNode<String, String>) {
         var value: Any = "no value"
         val valueSet = treeNode.valuesSet
-        value = if (valueSet != null) {
-            valueSet.value!!
-        } else {
-            treeNode.category.toString() + " " + treeNode.categoryValue
-        }
+        value = valueSet?.value ?: treeNode.category.toString() + " " + treeNode.categoryValue
         textView.text = value.toString()
         imageView.setRotation(if (treeNode.isExpanded) 90f else 0f)
         imageView.visibility = if (treeNode.hasChild()) View.VISIBLE else View.INVISIBLE

@@ -23,7 +23,7 @@ class MyNodeViewFactory : BaseNodeViewFactory<String, String>() {
             0 -> R.layout.item_first_level
             1 -> R.layout.item_second_level
             2 -> R.layout.item_third_level
-            else -> 0
+            else -> R.layout.item_first_level
         }
     }
 }

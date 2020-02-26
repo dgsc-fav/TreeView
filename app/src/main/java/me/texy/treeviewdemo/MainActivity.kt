@@ -14,7 +14,9 @@ import androidx.appcompat.widget.Toolbar
 import me.texy.treeview.TreeNode
 import me.texy.treeview.TreeNode.Companion.root
 import me.texy.treeview.TreeView
+import me.texy.treeview.TreeViewAdapter
 import me.texy.treeviewdemo.FakeDataGenerator.buildTree
+import me.texy.treeviewdemo.FakeDataGenerator.runtimeAppendValueToTree
 
 /**
  * https://github.com/shineM/TreeView
@@ -23,18 +25,24 @@ class MainActivity : AppCompatActivity() {
 
     protected var toolbar: Toolbar? = null
     private var viewGroup: ViewGroup? = null
+
     private var root: TreeNode<String, String>? = null
+
     private var treeView: TreeView<String, String>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         super.setContentView(R.layout.activity_main)
         initView()
-        root = root()
+        root = root<String, String>()
         buildTree()
-        treeView = TreeView(root, this, MyNodeViewFactory())
+        treeView = TreeView(this, root!!, MyNodeViewFactory(), false, object : TreeViewAdapter.OnTreeNodeClickListener<String, String> {
+            override fun onTreeNodeClick(treeNode: TreeNode<String, String>) {
+                Toast.makeText(this@MainActivity, treeNode.toString(), Toast.LENGTH_SHORT).show()
+            }
+        })
         val view = treeView!!.view
-        view.layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        view.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         viewGroup!!.addView(view)
     }
 
@@ -45,6 +53,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.add_value -> {
+                val node = runtimeAppendValueToTree(root!!)
+                node?.let {
+                    treeView?.refreshTreeView()
+                }
+            }
             R.id.select_all -> treeView!!.selectAll()
             R.id.deselect_all -> treeView!!.deselectAll()
             R.id.expand_all -> treeView!!.expandAll()

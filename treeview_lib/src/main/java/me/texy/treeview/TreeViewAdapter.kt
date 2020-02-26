@@ -35,13 +35,17 @@ import java.util.ArrayList
  */
 class TreeViewAdapter<V, C> internal constructor(
         private val context: Context,
+        private val treeView: TreeView<V, C>,
         private val root: TreeNode<V, C>,
         private val baseNodeViewFactory: BaseNodeViewFactory<V, C>,
-        private val showEmptyNode: Boolean) : RecyclerView.Adapter<ViewHolder>() {
+        private val showEmptyNode: Boolean = false,
+        private val onTreeNodeClickListener: OnTreeNodeClickListener<V, C>? = null) : RecyclerView.Adapter<ViewHolder>() {
 
     private val expandedNodeList: MutableList<TreeNode<V, C>> = ArrayList()
 
-    private var treeView: TreeView<V, C>? = null
+    interface OnTreeNodeClickListener<V, C> {
+        fun onTreeNodeClick(treeNode: TreeNode<V, C>)
+    }
 
     init {
         buildExpandedNodeList()
@@ -94,9 +98,15 @@ class TreeViewAdapter<V, C> internal constructor(
                 viewBinder.onNodeToggled(treeNode, treeNode.isExpanded)
             }
         } else if (treeNode.isItemClickEnable) {
-            nodeView.setOnClickListener {
-                onNodeToggled(treeNode)
-                viewBinder.onNodeToggled(treeNode, treeNode.isExpanded)
+            if (treeNode.isGroup) {
+                nodeView.setOnClickListener {
+                    onNodeToggled(treeNode)
+                    viewBinder.onNodeToggled(treeNode, treeNode.isExpanded)
+                }
+            } else {
+                nodeView.setOnClickListener {
+                    onTreeNodeClickListener?.onTreeNodeClick(treeNode)
+                }
             }
         }
         if (viewBinder is CheckableNodeViewBinder<V, C>) {
@@ -108,6 +118,7 @@ class TreeViewAdapter<V, C> internal constructor(
     private fun setupCheckableItem(nodeView: View,
             treeNode: TreeNode<V, C>,
             viewBinder: CheckableNodeViewBinder<V, C>) {
+
         val view = nodeView.findViewById<View>(viewBinder.checkableViewId)
         if (view is Checkable) {
             val checkableView = view as Checkable
@@ -230,9 +241,4 @@ class TreeViewAdapter<V, C> internal constructor(
         }
         notifyItemRemoved(index)
     }
-
-    fun setTreeView(treeView: TreeView<V, C>?) {
-        this.treeView = treeView
-    }
-
 }
