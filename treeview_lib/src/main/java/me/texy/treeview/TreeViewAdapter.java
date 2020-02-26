@@ -34,20 +34,20 @@ import me.texy.treeview.helper.TreeHelper;
  * Created by xinyuanzhong on 2017/4/21.
  */
 
-public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class TreeViewAdapter<V, C> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context context;
 
-    private TreeNode root;
+    private TreeNode<V, C> root;
 
-    private List<TreeNode> expandedNodeList;
+    private List<TreeNode<V, C>> expandedNodeList;
 
-    private BaseNodeViewFactory baseNodeViewFactory;
+    private BaseNodeViewFactory<V, C> baseNodeViewFactory;
 
     private TreeView treeView;
 
-    TreeViewAdapter(Context context, TreeNode root,
-                    @NonNull BaseNodeViewFactory baseNodeViewFactory) {
+    TreeViewAdapter(Context context, TreeNode<V, C> root,
+                    @NonNull BaseNodeViewFactory<V, C> baseNodeViewFactory) {
         this.context = context;
         this.root = root;
         this.baseNodeViewFactory = baseNodeViewFactory;
@@ -60,19 +60,29 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private void buildExpandedNodeList() {
         expandedNodeList.clear();
 
-        for (TreeNode child : root.getChildren()) {
+        for (TreeNode<V, C> child : root.getChildren()) {
             insertNode(expandedNodeList, child);
         }
     }
 
-    private void insertNode(List<TreeNode> nodeList, TreeNode treeNode) {
-        nodeList.add(treeNode);
+    boolean addEmptyNode = false;
 
-        if (!treeNode.hasChild()) {
+    private void insertNode(List<TreeNode<V, C>> nodeList, TreeNode<V, C> treeNode) {
+
+        if (addEmptyNode) {
+            nodeList.add(treeNode);
+        }
+
+        if (treeNode.isGroup() && !treeNode.hasChild()) {
             return;
         }
+
+        if (!addEmptyNode) {
+            nodeList.add(treeNode);
+        }
+
         if (treeNode.isExpanded()) {
-            for (TreeNode child : treeNode.getChildren()) {
+            for (TreeNode<V, C> child : treeNode.getChildren()) {
                 insertNode(nodeList, child);
             }
         }
@@ -81,7 +91,7 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public int getItemViewType(int position) {
         // return expandedNodeList.get(position).getLevel(); // this old code row used to always return the level
-        TreeNode treeNode = expandedNodeList.get(position);
+        TreeNode<V, C> treeNode = expandedNodeList.get(position);
         int viewType = this.baseNodeViewFactory.getViewType(treeNode); // default implementation returns the three node level but it can be overridden
         return viewType;
     }
@@ -99,8 +109,8 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position) {
         final View nodeView = holder.itemView;
-        final TreeNode treeNode = expandedNodeList.get(position);
-        final BaseNodeViewBinder viewBinder = (BaseNodeViewBinder) holder;
+        final TreeNode<V, C> treeNode = expandedNodeList.get(position);
+        final BaseNodeViewBinder<V, C> viewBinder = (BaseNodeViewBinder) holder;
 
         if (viewBinder.getToggleTriggerViewId() != 0) {
             View triggerToggleView = nodeView.findViewById(viewBinder.getToggleTriggerViewId());
@@ -132,7 +142,7 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private void setupCheckableItem(View nodeView,
-                                    final TreeNode treeNode,
+                                    final TreeNode<V, C> treeNode,
                                     final CheckableNodeViewBinder viewBinder) {
         final View view = nodeView.findViewById(viewBinder.getCheckableViewId());
 
@@ -154,23 +164,23 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    void selectNode(boolean checked, TreeNode treeNode) {
+    void selectNode(boolean checked, TreeNode<V, C> treeNode) {
         treeNode.setSelected(checked);
 
         selectChildren(treeNode, checked);
         selectParentIfNeed(treeNode, checked);
     }
 
-    private void selectChildren(TreeNode treeNode, boolean checked) {
-        List<TreeNode> impactedChildren = TreeHelper.selectNodeAndChild(treeNode, checked);
+    private void selectChildren(TreeNode<V, C> treeNode, boolean checked) {
+        List<TreeNode<V, C>> impactedChildren = TreeHelper.selectNodeAndChild(treeNode, checked);
         int index = expandedNodeList.indexOf(treeNode);
         if (index != -1 && impactedChildren.size() > 0) {
             notifyItemRangeChanged(index, impactedChildren.size() + 1);
         }
     }
 
-    private void selectParentIfNeed(TreeNode treeNode, boolean checked) {
-        List<TreeNode> impactedParents = TreeHelper.selectParentIfNeedWhenNodeSelected(treeNode, checked);
+    private void selectParentIfNeed(TreeNode<V, C> treeNode, boolean checked) {
+        List<TreeNode<V, C>> impactedParents = TreeHelper.selectParentIfNeedWhenNodeSelected(treeNode, checked);
         if (impactedParents.size() > 0) {
             for (TreeNode parent : impactedParents) {
                 int position = expandedNodeList.indexOf(parent);
@@ -179,7 +189,7 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    private void onNodeToggled(TreeNode treeNode) {
+    private void onNodeToggled(TreeNode<V, C> treeNode) {
         treeNode.setExpanded(!treeNode.isExpanded());
 
         if (treeNode.isExpanded()) {
@@ -204,7 +214,7 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     // Insert a node list after index.
-    private void insertNodesAtIndex(int index, List<TreeNode> additionNodes) {
+    private void insertNodesAtIndex(int index, List<TreeNode<V, C>> additionNodes) {
         if (index < 0 || index > expandedNodeList.size() - 1 || additionNodes == null) {
             return;
         }
@@ -213,7 +223,7 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     //Remove a node list after index.
-    private void removeNodesAtIndex(int index, List<TreeNode> removedNodes) {
+    private void removeNodesAtIndex(int index, List<TreeNode<V, C>> removedNodes) {
         if (index < 0 || index > expandedNodeList.size() - 1 || removedNodes == null) {
             return;
         }
@@ -224,11 +234,11 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     /**
      * Expand node. This operation will keep the structure of children(not expand children)
      */
-    void expandNode(TreeNode treeNode) {
+    void expandNode(TreeNode<V, C> treeNode) {
         if (treeNode == null) {
             return;
         }
-        List<TreeNode> additionNodes = TreeHelper.expandNode(treeNode, false);
+        List<TreeNode<V, C>> additionNodes = TreeHelper.expandNode(treeNode, false);
         int index = expandedNodeList.indexOf(treeNode);
 
         insertNodesAtIndex(index, additionNodes);
@@ -238,11 +248,11 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     /**
      * Collapse node. This operation will keep the structure of children(not collapse children)
      */
-    void collapseNode(TreeNode treeNode) {
+    void collapseNode(TreeNode<V, C> treeNode) {
         if (treeNode == null) {
             return;
         }
-        List<TreeNode> removedNodes = TreeHelper.collapseNode(treeNode, false);
+        List<TreeNode<V, C>> removedNodes = TreeHelper.collapseNode(treeNode, false);
         int index = expandedNodeList.indexOf(treeNode);
 
         removeNodesAtIndex(index, removedNodes);
@@ -251,11 +261,11 @@ public class TreeViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     /**
      * Delete a node from list.This operation will also delete its children.
      */
-    void deleteNode(TreeNode node) {
+    void deleteNode(TreeNode<V, C> node) {
         if (node == null || node.getParent() == null) {
             return;
         }
-        List<TreeNode> allNodes = TreeHelper.getAllNodes(root);
+        List<TreeNode<V, C>> allNodes = TreeHelper.getAllNodes(root);
         if (allNodes.indexOf(node) != -1) {
             node.getParent().removeChild(node);
         }

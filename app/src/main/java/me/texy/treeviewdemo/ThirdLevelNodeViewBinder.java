@@ -4,6 +4,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import me.texy.treeview.TreeNode;
+import me.texy.treeview.ValuesSet;
 import me.texy.treeview.base.CheckableNodeViewBinder;
 
 /**
@@ -24,6 +25,12 @@ public class ThirdLevelNodeViewBinder extends CheckableNodeViewBinder {
 
     @Override
     public void bindView(TreeNode treeNode) {
-        textView.setText(treeNode.getValue().toString());
+        Object value = "no value";
+        ValuesSet valueSet = treeNode.getValuesSet();
+        if (valueSet != null) {
+            value = valueSet.getValue();
+        }
+
+        textView.setText(value.toString());
     }
 }

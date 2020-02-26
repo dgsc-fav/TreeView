@@ -18,12 +18,15 @@ import java.util.List;
 import me.texy.treeview.TreeNode;
 import me.texy.treeview.TreeView;
 
+/**
+ * https://github.com/shineM/TreeView
+ */
 public class MainActivity extends AppCompatActivity {
 
     protected Toolbar toolbar;
     private ViewGroup viewGroup;
-    private TreeNode root;
-    private TreeView treeView;
+    private TreeNode<String, String> root;
+    private TreeView<String, String> treeView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
         root = TreeNode.root();
         buildTree();
-        treeView = new TreeView(root, this, new MyNodeViewFactory());
+        treeView = new TreeView<String, String>(root, this, new MyNodeViewFactory<String, String>());
         View view = treeView.getView();
         view.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -76,10 +79,10 @@ public class MainActivity extends AppCompatActivity {
 
     private String getSelectedNodes() {
         StringBuilder stringBuilder = new StringBuilder("You have selected: ");
-        List<TreeNode> selectedNodes = treeView.getSelectedNodes();
+        List<TreeNode<String, String>> selectedNodes = treeView.getSelectedNodes();
         for (int i = 0; i < selectedNodes.size(); i++) {
             if (i < 5) {
-                stringBuilder.append(selectedNodes.get(i).getValue().toString() + ",");
+                stringBuilder.append(selectedNodes.get(i).getValuesSet().toString() + ",");
             } else {
                 stringBuilder.append("...and " + (selectedNodes.size() - 5) + " more.");
                 break;
@@ -89,24 +92,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void buildTree() {
-        for (int i = 0; i < 20; i++) {
-            TreeNode treeNode = new TreeNode("Parent  " + "No." + i, 0);
-            if(i != 3) { // avoids creating child nodes for "parent" 3 (which then is not a parent, so the semantic in the displayed text becomes incorrect)
-                for (int j = 0; j < 10; j++) {
-                    TreeNode treeNode1 = new TreeNode("Child " + "No." + j, 1);
-                    if(j != 5) { // avoids creating grand child nodes for child node 5
-                        // For the child node without grand children there should not be any arrow displayed.
-                        // In the demo code this can be handled in method 'SecondLevelNodeViewBinder.bindView' like this:
-                        // imageView.setVisibility(treeNode.hasChild() ? View.VISIBLE : View.INVISIBLE);
-                        for (int k = 0; k < 5; k++) {
-                            TreeNode treeNode2 = new TreeNode("Grand Child " + "No." + k, 2);
-                            treeNode1.addChild(treeNode2);
-                        }
-                    }
-                    treeNode.addChild(treeNode1);
-                }
-            }
-            root.addChild(treeNode);
+        if (false) {
+//            for (int i = 0; i < 20; i++) {
+//                TreeNode treeNode = new TreeNode("Parent  " + "No." + i, 0);
+//                treeNode.setExpanded(true);
+//                //treeNode.setItemClickEnable(false);
+//
+//                if(i != 3) { // avoids creating child nodes for "parent" 3 (which then is not a parent, so the semantic in the displayed text becomes incorrect)
+//                    for (int j = 0; j < 10; j++) {
+//                        TreeNode treeNode1 = new TreeNode("Child " + i + "-" + j, 1);
+//                        if(j != 5) { // avoids creating grand child nodes for child node 5
+//                            // For the child node without grand children there should not be any arrow displayed.
+//                            // In the demo code this can be handled in method 'SecondLevelNodeViewBinder.bindView' like this:
+//                            // imageView.setVisibility(treeNode.hasChild() ? View.VISIBLE : View.INVISIBLE);
+//                            for (int k = 0; k < 5; k++) {
+//                                TreeNode treeNode2 = new TreeNode("Grand Child " + i + "-" + j + "-" + k, 2);
+//                                treeNode1.addChild(treeNode2);
+//                            }
+//                        }
+//                        treeNode.addChild(treeNode1);
+//                    }
+//                }
+//                root.addChild(treeNode);
+//            }
+        } else {
+            FakeDataGenerator.INSTANCE.printDFS(root);
         }
     }
 

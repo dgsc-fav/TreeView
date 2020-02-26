@@ -22,7 +22,7 @@ import me.texy.treeview.TreeNode;
  * Created by zxy on 17/4/23.
  */
 
-public abstract class BaseNodeViewFactory {
+public abstract class BaseNodeViewFactory<V, C> {
 
     /**
     * The default implementation below behaves as in previous version when TreeViewAdapter.getItemViewType always returned the level,
@@ -30,7 +30,7 @@ public abstract class BaseNodeViewFactory {
     * @param treeNode
     * @return
     */
-    public int getViewType(TreeNode treeNode) {
+    public int getViewType(TreeNode<V, C> treeNode) {
         return treeNode.getLevel();
     }
 

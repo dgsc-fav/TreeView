@@ -22,7 +22,7 @@ import me.texy.treeview.TreeNode;
  * Created by xinyuanzhong on 2017/4/27.
  */
 
-public abstract class CheckableNodeViewBinder extends BaseNodeViewBinder {
+public abstract class CheckableNodeViewBinder<V, C> extends BaseNodeViewBinder {
 
     public CheckableNodeViewBinder(View itemView) {
         super(itemView);
@@ -41,7 +41,7 @@ public abstract class CheckableNodeViewBinder extends BaseNodeViewBinder {
      * @param treeNode
      * @param selected
      */
-    public void onNodeSelectedChanged(TreeNode treeNode, boolean selected) {
+    public void onNodeSelectedChanged(TreeNode<V, C> treeNode, boolean selected) {
         /*empty*/
     }
 }

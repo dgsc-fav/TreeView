@@ -22,26 +22,26 @@ import me.texy.treeview.TreeNode;
  * Created by xinyuanzhong on 2017/4/20.
  */
 
-public interface BaseTreeAction {
+public interface BaseTreeAction<V, C> {
     void expandAll();
 
-    void expandNode(TreeNode treeNode);
+    void expandNode(TreeNode<V, C> treeNode);
 
     void expandLevel(int level);
 
     void collapseAll();
 
-    void collapseNode(TreeNode treeNode);
+    void collapseNode(TreeNode<V, C> treeNode);
 
     void collapseLevel(int level);
 
-    void toggleNode(TreeNode treeNode);
+    void toggleNode(TreeNode<V, C> treeNode);
 
-    void deleteNode(TreeNode node);
+    void deleteNode(TreeNode<V, C> node);
 
-    void addNode(TreeNode parent, TreeNode treeNode);
+    void addNode(TreeNode<V, C> parent, TreeNode<V, C> treeNode);
 
-    List<TreeNode> getAllNodes();
+    List<TreeNode<V, C>> getAllNodes();
 
     // TODO: 17/4/30
     // 1.add node at position

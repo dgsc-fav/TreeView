@@ -31,8 +31,8 @@ import me.texy.treeview.helper.TreeHelper;
  * Created by xinyuanzhong on 2017/4/20.
  */
 
-public class TreeView implements SelectableTreeAction {
-    private TreeNode root;
+public class TreeView<V, C> implements SelectableTreeAction<V, C> {
+    private TreeNode<V, C> root;
 
     private Context context;
 
@@ -40,11 +40,11 @@ public class TreeView implements SelectableTreeAction {
 
     private RecyclerView rootView;
 
-    private TreeViewAdapter adapter;
+    private TreeViewAdapter<V, C> adapter;
 
     private boolean itemSelectable = true;
 
-    public TreeView(@NonNull TreeNode root, @NonNull Context context, @NonNull BaseNodeViewFactory baseNodeViewFactory) {
+    public TreeView(@NonNull TreeNode<V, C> root, @NonNull Context context, @NonNull BaseNodeViewFactory<V, C> baseNodeViewFactory) {
         this.root = root;
         this.context = context;
         this.baseNodeViewFactory = baseNodeViewFactory;
@@ -71,7 +71,7 @@ public class TreeView implements SelectableTreeAction {
         ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        adapter = new TreeViewAdapter(context, root, baseNodeViewFactory);
+        adapter = new TreeViewAdapter<V, C>(context, root, baseNodeViewFactory);
         adapter.setTreeView(this);
         recyclerView.setAdapter(adapter);
         return recyclerView;
@@ -101,7 +101,7 @@ public class TreeView implements SelectableTreeAction {
     }
 
     @Override
-    public void expandNode(TreeNode treeNode) {
+    public void expandNode(TreeNode<V, C> treeNode) {
         adapter.expandNode(treeNode);
     }
 
@@ -123,7 +123,7 @@ public class TreeView implements SelectableTreeAction {
     }
 
     @Override
-    public void collapseNode(TreeNode treeNode) {
+    public void collapseNode(TreeNode<V, C> treeNode) {
         adapter.collapseNode(treeNode);
     }
 
@@ -156,19 +156,19 @@ public class TreeView implements SelectableTreeAction {
     }
 
     @Override
-    public List<TreeNode> getAllNodes() {
+    public List<TreeNode<V, C>> getAllNodes() {
         return TreeHelper.getAllNodes(root);
     }
 
     @Override
-    public void selectNode(TreeNode treeNode) {
+    public void selectNode(TreeNode<V, C> treeNode) {
         if (treeNode != null) {
             adapter.selectNode(true, treeNode);
         }
     }
 
     @Override
-    public void deselectNode(TreeNode treeNode) {
+    public void deselectNode(TreeNode<V, C> treeNode) {
         if (treeNode != null) {
             adapter.selectNode(false, treeNode);
         }
@@ -189,7 +189,7 @@ public class TreeView implements SelectableTreeAction {
     }
 
     @Override
-    public List<TreeNode> getSelectedNodes() {
+    public List<TreeNode<V, C>> getSelectedNodes() {
         return TreeHelper.getSelectedNodes(root);
     }
 

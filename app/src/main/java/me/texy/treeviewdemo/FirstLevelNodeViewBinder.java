@@ -5,6 +5,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import me.texy.treeview.TreeNode;
+import me.texy.treeview.ValuesSet;
 import me.texy.treeview.base.CheckableNodeViewBinder;
 
 /**
@@ -14,6 +15,7 @@ import me.texy.treeview.base.CheckableNodeViewBinder;
 public class FirstLevelNodeViewBinder extends CheckableNodeViewBinder {
     TextView textView;
     ImageView imageView;
+
     public FirstLevelNodeViewBinder(View itemView) {
         super(itemView);
         textView = itemView.findViewById(R.id.node_name_view);
@@ -27,7 +29,15 @@ public class FirstLevelNodeViewBinder extends CheckableNodeViewBinder {
 
     @Override
     public void bindView(final TreeNode treeNode) {
-        textView.setText(treeNode.getValue().toString());
+        Object value = "no value";
+        ValuesSet valueSet = treeNode.getValuesSet();
+        if (valueSet != null) {
+            value = valueSet.getValue();
+        } else {
+            value = treeNode.getCategory() + " " + treeNode.getCategoryValue();
+        }
+
+        textView.setText(value.toString());
         imageView.setRotation(treeNode.isExpanded() ? 90 : 0);
         imageView.setVisibility(treeNode.hasChild() ? View.VISIBLE : View.INVISIBLE);
     }

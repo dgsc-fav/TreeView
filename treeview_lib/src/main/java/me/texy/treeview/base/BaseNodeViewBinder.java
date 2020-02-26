@@ -24,18 +24,18 @@ import me.texy.treeview.TreeView;
  * Created by zxy on 17/4/23.
  */
 
-public abstract class BaseNodeViewBinder extends RecyclerView.ViewHolder {
+public abstract class BaseNodeViewBinder<V, C> extends RecyclerView.ViewHolder {
     /**
      * This reference of TreeView make BaseNodeViewBinder has the ability
      * to expand node or select node.
      */
-    protected TreeView treeView;
+    protected TreeView<V, C> treeView;
 
     public BaseNodeViewBinder(View itemView) {
         super(itemView);
     }
 
-    public void setTreeView(TreeView treeView) {
+    public void setTreeView(TreeView<V, C> treeView) {
         this.treeView = treeView;
     }
 
@@ -44,7 +44,7 @@ public abstract class BaseNodeViewBinder extends RecyclerView.ViewHolder {
      *
      * @param treeNode Node data
      */
-    public abstract void bindView(TreeNode treeNode);
+    public abstract void bindView(TreeNode<V, C> treeNode);
 
     /**
      * if you do not want toggle the node when click whole item view,then you can assign a view to
@@ -62,7 +62,7 @@ public abstract class BaseNodeViewBinder extends RecyclerView.ViewHolder {
      * @param treeNode The toggled node
      * @param expand   Expanded or collapsed
      */
-    public void onNodeToggled(TreeNode treeNode, boolean expand) {
+    public void onNodeToggled(TreeNode<V, C> treeNode, boolean expand) {
         //empty
     }
 }

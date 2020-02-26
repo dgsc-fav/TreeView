@@ -10,7 +10,7 @@ import me.texy.treeview.base.BaseNodeViewFactory;
  * Created by zxy on 17/4/23.
  */
 
-public class MyNodeViewFactory extends BaseNodeViewFactory {
+public class MyNodeViewFactory<V, C> extends BaseNodeViewFactory {
 
     @Override
     public BaseNodeViewBinder getNodeViewBinder(View view, int level) {

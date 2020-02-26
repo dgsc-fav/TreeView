@@ -39,8 +39,8 @@ public class TreeHelper {
      * @param includeChild should expand child
      * @return the visible addition nodes
      */
-    public static List<TreeNode> expandNode(TreeNode treeNode, boolean includeChild) {
-        List<TreeNode> expandChildren = new ArrayList<>();
+    public static <V, C> List<TreeNode<V, C>> expandNode(TreeNode<V, C> treeNode, boolean includeChild) {
+        List<TreeNode<V, C>> expandChildren = new ArrayList<>();
 
         if (treeNode == null) {
             return expandChildren;
@@ -52,7 +52,7 @@ public class TreeHelper {
             return expandChildren;
         }
 
-        for (TreeNode child : treeNode.getChildren()) {
+        for (TreeNode<V, C> child : treeNode.getChildren()) {
             expandChildren.add(child);
 
             if (includeChild || child.isExpanded()) {
@@ -69,12 +69,12 @@ public class TreeHelper {
      * @param root  the tree root
      * @param level the level to expand
      */
-    public static void expandLevel(TreeNode root, int level) {
+    public static <V, C> void expandLevel(TreeNode<V, C> root, int level) {
         if (root == null) {
             return;
         }
 
-        for (TreeNode child : root.getChildren()) {
+        for (TreeNode<V, C> child : root.getChildren()) {
             if (child.getLevel() == level) {
                 expandNode(child, false);
             } else {
@@ -83,11 +83,11 @@ public class TreeHelper {
         }
     }
 
-    public static void collapseAll(TreeNode node) {
+    public static <V, C> void collapseAll(TreeNode<V, C> node) {
         if (node == null) {
             return;
         }
-        for (TreeNode child : node.getChildren()) {
+        for (TreeNode<V, C> child : node.getChildren()) {
             performCollapseNode(child, true);
         }
     }
@@ -99,14 +99,14 @@ public class TreeHelper {
      * @param includeChild should collapse child
      * @return the visible addition nodes before remove
      */
-    public static List<TreeNode> collapseNode(TreeNode node, boolean includeChild) {
-        List<TreeNode> treeNodes = performCollapseNode(node, includeChild);
+    public static <V, C> List<TreeNode<V, C>> collapseNode(TreeNode<V, C> node, boolean includeChild) {
+        List<TreeNode<V, C>> treeNodes = performCollapseNode(node, includeChild);
         node.setExpanded(false);
         return treeNodes;
     }
 
-    private static List<TreeNode> performCollapseNode(TreeNode node, boolean includeChild) {
-        List<TreeNode> collapseChildren = new ArrayList<>();
+    private static <V, C> List<TreeNode<V, C>> performCollapseNode(TreeNode<V, C> node, boolean includeChild) {
+        List<TreeNode<V, C>> collapseChildren = new ArrayList<>();
 
         if (node == null) {
             return collapseChildren;
@@ -114,7 +114,7 @@ public class TreeHelper {
         if (includeChild) {
             node.setExpanded(false);
         }
-        for (TreeNode child : node.getChildren()) {
+        for (TreeNode<V, C> child : node.getChildren()) {
             collapseChildren.add(child);
 
             if (child.isExpanded()) {
@@ -132,17 +132,17 @@ public class TreeHelper {
      *
      * @param node target node to collapse
      */
-    private static void performCollapseNodeInner(TreeNode node) {
+    private static <V, C> void performCollapseNodeInner(TreeNode<V, C> node) {
         if (node == null) {
             return;
         }
         node.setExpanded(false);
-        for (TreeNode child : node.getChildren()) {
+        for (TreeNode<V, C> child : node.getChildren()) {
             performCollapseNodeInner(child);
         }
     }
 
-    public static void collapseLevel(TreeNode root, int level) {
+    public static <V, C> void collapseLevel(TreeNode<V, C> root, int level) {
         if (root == null) {
             return;
         }
@@ -155,8 +155,8 @@ public class TreeHelper {
         }
     }
 
-    public static List<TreeNode> getAllNodes(TreeNode root) {
-        List<TreeNode> allNodes = new ArrayList<>();
+    public static <V, C> List<TreeNode<V, C>> getAllNodes(TreeNode<V, C> root) {
+        List<TreeNode<V, C>> allNodes = new ArrayList<>();
 
         fillNodeList(allNodes, root);
         allNodes.remove(root);
@@ -164,11 +164,11 @@ public class TreeHelper {
         return allNodes;
     }
 
-    private static void fillNodeList(List<TreeNode> treeNodes, TreeNode treeNode) {
+    private static <V, C> void fillNodeList(List<TreeNode<V, C>> treeNodes, TreeNode<V, C> treeNode) {
         treeNodes.add(treeNode);
 
         if (treeNode.hasChild()) {
-            for (TreeNode child : treeNode.getChildren()) {
+            for (TreeNode<V, C> child : treeNode.getChildren()) {
                 fillNodeList(treeNodes, child);
             }
         }
@@ -177,8 +177,8 @@ public class TreeHelper {
     /**
      * Select the node and node's children,return the visible nodes
      */
-    public static List<TreeNode> selectNodeAndChild(TreeNode treeNode, boolean select) {
-        List<TreeNode> expandChildren = new ArrayList<>();
+    public static <V, C> List<TreeNode<V, C>> selectNodeAndChild(TreeNode<V, C> treeNode, boolean select) {
+        List<TreeNode<V, C>> expandChildren = new ArrayList<>();
 
         if (treeNode == null) {
             return expandChildren;
@@ -191,7 +191,7 @@ public class TreeHelper {
         }
 
         if (treeNode.isExpanded()) {
-            for (TreeNode child : treeNode.getChildren()) {
+            for (TreeNode<V, C> child : treeNode.getChildren()) {
                 expandChildren.add(child);
 
                 if (child.isExpanded()) {
@@ -206,13 +206,13 @@ public class TreeHelper {
         return expandChildren;
     }
 
-    private static void selectNodeInner(TreeNode treeNode, boolean select) {
+    private static <V, C> void selectNodeInner(TreeNode<V, C> treeNode, boolean select) {
         if (treeNode == null) {
             return;
         }
         treeNode.setSelected(select);
         if (treeNode.hasChild()) {
-            for (TreeNode child : treeNode.getChildren()) {
+            for (TreeNode<V, C> child : treeNode.getChildren()) {
                 selectNodeInner(child, select);
             }
         }
@@ -222,19 +222,19 @@ public class TreeHelper {
      * Select parent when all the brothers have been selected, otherwise deselect parent,
      * and check the grand parent recursive.
      */
-    public static List<TreeNode> selectParentIfNeedWhenNodeSelected(TreeNode treeNode, boolean select) {
-        List<TreeNode> impactedParents = new ArrayList<>();
+    public static <V, C> List<TreeNode<V, C>> selectParentIfNeedWhenNodeSelected(TreeNode<V, C> treeNode, boolean select) {
+        List<TreeNode<V, C>> impactedParents = new ArrayList<>();
         if (treeNode == null) {
             return impactedParents;
         }
 
         //ensure that the node's level is bigger than 1(first level is 1)
-        TreeNode parent = treeNode.getParent();
+        TreeNode<V, C> parent = treeNode.getParent();
         if (parent == null || parent.getParent() == null) {
             return impactedParents;
         }
 
-        List<TreeNode> brothers = parent.getChildren();
+        List<TreeNode<V, C>> brothers = parent.getChildren();
         int selectedBrotherCount = 0;
         for (TreeNode brother : brothers) {
             if (brother.isSelected()) selectedBrotherCount++;
@@ -257,15 +257,15 @@ public class TreeHelper {
     /**
      * Get the selected nodes under current node, include itself
      */
-    public static List<TreeNode> getSelectedNodes(TreeNode treeNode) {
-        List<TreeNode> selectedNodes = new ArrayList<>();
+    public static <V, C> List<TreeNode<V, C>> getSelectedNodes(TreeNode<V, C> treeNode) {
+        List<TreeNode<V, C>> selectedNodes = new ArrayList<>();
         if (treeNode == null) {
             return selectedNodes;
         }
 
         if (treeNode.isSelected() && treeNode.getParent() != null) selectedNodes.add(treeNode);
 
-        for (TreeNode child : treeNode.getChildren()) {
+        for (TreeNode<V, C> child : treeNode.getChildren()) {
             selectedNodes.addAll(getSelectedNodes(child));
         }
         return selectedNodes;
@@ -275,12 +275,12 @@ public class TreeHelper {
      * Return true when the node has one selected child(recurse all children) at least,
      * otherwise return false
      */
-    public static boolean hasOneSelectedNodeAtLeast(TreeNode treeNode) {
+    public static <V, C> boolean hasOneSelectedNodeAtLeast(TreeNode<V, C> treeNode) {
         if (treeNode == null || treeNode.getChildren().size() == 0) {
             return false;
         }
-        List<TreeNode> children = treeNode.getChildren();
-        for (TreeNode child : children) {
+        List<TreeNode<V, C>> children = treeNode.getChildren();
+        for (TreeNode<V, C> child : children) {
             if (child.isSelected() || hasOneSelectedNodeAtLeast(child)) {
                 return true;
             }

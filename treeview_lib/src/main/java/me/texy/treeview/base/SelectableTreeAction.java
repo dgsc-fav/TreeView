@@ -22,14 +22,14 @@ import me.texy.treeview.TreeNode;
  * Created by xinyuanzhong on 2017/4/27.
  */
 
-public interface SelectableTreeAction extends BaseTreeAction {
-    void selectNode(TreeNode treeNode);
+public interface SelectableTreeAction<V, C> extends BaseTreeAction<V, C> {
+    void selectNode(TreeNode<V, C> treeNode);
 
-    void deselectNode(TreeNode treeNode);
+    void deselectNode(TreeNode<V, C> treeNode);
 
     void selectAll();
 
     void deselectAll();
 
-    List<TreeNode> getSelectedNodes();
+    List<TreeNode<V, C>> getSelectedNodes();
 }
