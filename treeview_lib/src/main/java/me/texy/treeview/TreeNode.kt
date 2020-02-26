@@ -19,7 +19,30 @@ import java.util.LinkedList
 
 /**
  * Created by xinyuanzhong on 2017/4/20.
+ * Dmitry Korchagin. 24.02.2020
  */
+
+interface Category<V> : Comparable<Category<V>> {
+    val level: Int
+
+    val pinned: Boolean
+
+    override fun compareTo(other: Category<V>): Int {
+        return level.compareTo(other.level)
+    }
+
+    fun asKey(): Any
+}
+
+interface ValuesSet<V, C> {
+    fun getValueForCategory(category: Category<C>): C?
+
+    val value: V
+}
+
+interface CategoriesHolder<C> {
+    val categoriesByPriority: Array<Category<C>>
+}
 
 class TreeNode<V, C>(
         // a parent item for this item. may be null if it is a root item
@@ -175,8 +198,6 @@ class TreeNode<V, C>(
 
     fun add(valuesSet: ValuesSet<V, C>, categoriesHolder: CategoriesHolder<C>): TreeNode<V, C>? {
 
-        println("add item=$valuesSet")
-
         // as mentioned above, we use the filesystem behaviour - firstly make all the folders next add a file to the last folder
         // from highest priority category to the lowest
 
@@ -192,8 +213,6 @@ class TreeNode<V, C>(
             // get child from parentGroup.children with specified value
             val node = getOrCreateNode(currNode, currentCategory, nextCategory, valuesSet)
 
-            println("getOrCreateGroup result: group=$node")
-
             if (node != null) {
                 // next search will from returned node
                 currNode = node
@@ -203,11 +222,11 @@ class TreeNode<V, C>(
                 }
             } else {
                 // this item does not contains a data for the highest category
-                if (currNode.isRoot) {
-                    println("SKIP THIS ITEM")
-                    return null
+                return if (currNode.isRoot) {
+                    println("Skip $valuesSet item as an item which has no root parent")
+                    null
                 } else {
-                    return insertValueSet(valuesSet, currNode)
+                    insertValueSet(valuesSet, currNode)
                 }
             }
         }
@@ -220,7 +239,6 @@ class TreeNode<V, C>(
      * Returns a node which must contains an item or null if the category is not specified in the item
      */
     private fun getOrCreateNode(node: TreeNode<V, C>, forCategory: Category<C>, nextCategory: Category<C>?, item: ValuesSet<V, C>): TreeNode<V, C>? {
-        println("getOrCreateGroup($node) item: $item")
 
         //
         if (node.childCategory == null) {
@@ -231,7 +249,6 @@ class TreeNode<V, C>(
         }
 
         val valueForCategory = item.getValueForCategory(forCategory)
-        println("valueForCategory($forCategory) is $valueForCategory")
 
         if (valueForCategory == null) {
             // the item has no data for the category
@@ -269,8 +286,7 @@ class TreeNode<V, C>(
     /**
      * Only get from current level. Does not create anything
      */
-    fun getChildNodeByCategoryValue(category: Category<C>, valueForCategory: C): TreeNode<V, C>? {
-        println("getGroupByCategory: $valueForCategory")
+    private fun getChildNodeByCategoryValue(category: Category<C>, valueForCategory: C): TreeNode<V, C>? {
 
         if (this.children == null) {
             // no initialized yet. no children

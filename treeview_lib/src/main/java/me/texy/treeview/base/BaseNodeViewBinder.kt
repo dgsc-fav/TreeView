@@ -11,40 +11,29 @@
  * ANY KIND, either express or implied. See the License for the specific language governing
  * permissions and limitations under.
  */
+package me.texy.treeview.base
 
-package me.texy.treeview.base;
-
-import android.view.View;
-
-import androidx.recyclerview.widget.RecyclerView;
-import me.texy.treeview.TreeNode;
-import me.texy.treeview.TreeView;
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import me.texy.treeview.TreeNode
+import me.texy.treeview.TreeView
 
 /**
  * Created by zxy on 17/4/23.
  */
-
-public abstract class BaseNodeViewBinder<V, C> extends RecyclerView.ViewHolder {
+abstract class BaseNodeViewBinder<V, C>(itemView: View) : ViewHolder(itemView) {
     /**
      * This reference of TreeView make BaseNodeViewBinder has the ability
      * to expand node or select node.
      */
-    protected TreeView<V, C> treeView;
-
-    public BaseNodeViewBinder(View itemView) {
-        super(itemView);
-    }
-
-    public void setTreeView(TreeView<V, C> treeView) {
-        this.treeView = treeView;
-    }
+    var treeView: TreeView<V, C>? = null
 
     /**
      * Bind your data to view,you can get the data from treeNode by getValue()
      *
      * @param treeNode Node data
      */
-    public abstract void bindView(TreeNode<V, C> treeNode);
+    abstract fun bindView(treeNode: TreeNode<V, C>)
 
     /**
      * if you do not want toggle the node when click whole item view,then you can assign a view to
@@ -52,9 +41,8 @@ public abstract class BaseNodeViewBinder<V, C> extends RecyclerView.ViewHolder {
      *
      * @return The assigned view id to trigger expand or collapse.
      */
-    public int getToggleTriggerViewId() {
-        return 0;
-    }
+    val toggleTriggerViewId: Int
+        get() = 0
 
     /**
      * Callback when a toggle action happened (only by clicked)
@@ -62,7 +50,6 @@ public abstract class BaseNodeViewBinder<V, C> extends RecyclerView.ViewHolder {
      * @param treeNode The toggled node
      * @param expand   Expanded or collapsed
      */
-    public void onNodeToggled(TreeNode<V, C> treeNode, boolean expand) {
-        //empty
+    open fun onNodeToggled(treeNode: TreeNode<V, C>, expand: Boolean) { //empty
     }
 }

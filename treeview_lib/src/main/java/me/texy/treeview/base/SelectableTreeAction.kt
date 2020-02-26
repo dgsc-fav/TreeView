@@ -11,25 +11,17 @@
  * ANY KIND, either express or implied. See the License for the specific language governing
  * permissions and limitations under.
  */
+package me.texy.treeview.base
 
-package me.texy.treeview.base;
-
-import java.util.List;
-
-import me.texy.treeview.TreeNode;
+import me.texy.treeview.TreeNode
 
 /**
  * Created by xinyuanzhong on 2017/4/27.
  */
-
-public interface SelectableTreeAction<V, C> extends BaseTreeAction<V, C> {
-    void selectNode(TreeNode<V, C> treeNode);
-
-    void deselectNode(TreeNode<V, C> treeNode);
-
-    void selectAll();
-
-    void deselectAll();
-
-    List<TreeNode<V, C>> getSelectedNodes();
+interface SelectableTreeAction<V, C> : BaseTreeAction<V, C> {
+    fun selectNode(treeNode: TreeNode<V, C>?)
+    fun deselectNode(treeNode: TreeNode<V, C>?)
+    fun selectAll()
+    fun deselectAll()
+    val selectedNodes: List<TreeNode<V, C>>?
 }

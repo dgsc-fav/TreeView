@@ -1,12 +1,10 @@
-package me.texy.treeviewdemo
+package me.texy.treeview
 
-import com.google.gson.Gson
-import me.texy.treeview.CategoriesHolder
-import me.texy.treeview.Category
-import me.texy.treeview.TreeNode
-import me.texy.treeview.ValuesSet
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Test
 
-object FakeDataGenerator {
+class TreeNodeTest {
     class ValuesSetImpl(val categoryTimeValue: String?, val categorySeverityValue: String?, override val value: String = "value") : ValuesSet<String, String> {
 
         override fun getValueForCategory(category: Category<String>): String? {
@@ -50,30 +48,30 @@ object FakeDataGenerator {
         override val pinned: Boolean = false
     }
 
-    fun buildTree(root: TreeNode<String, String>) {
+    @Test
+    fun testAddToTree() {
 
         val categoriesHolder = object : CategoriesHolder<String> {
             override val categoriesByPriority: Array<Category<String>> = arrayOf(CategoryTime(), CategorySeverity())
         }
 
-        val item_null_high = ValuesSetImpl(null, "high", "item_null_high")
-        val item_0_high = ValuesSetImpl("123", "high", "item_123_high")
-        val item_0_low = ValuesSetImpl("123", "low", "item_123_low")
-        val item_1_high = ValuesSetImpl("456", "high", "item_456_high")
-        val item_1_low = ValuesSetImpl("456", "low", "item_456_low")
+        val itemNullHigh = ValuesSetImpl(null, "high", "item_null_high")
+        val item0High = ValuesSetImpl("123", "high", "item_123_high")
+        val item0Low = ValuesSetImpl("123", "low", "item_123_low")
+        val item1High = ValuesSetImpl("456", "high", "item_456_high")
+        val item1Low = ValuesSetImpl("456", "low", "item_456_low")
 
-        val item_2_null = ValuesSetImpl("456", null, "item_456_null")
+        val item2Null = ValuesSetImpl("456", null, "item_456_null")
 
-        root.add(item_null_high, categoriesHolder)
-        root.add(item_0_high, categoriesHolder)
-        root.add(item_0_low, categoriesHolder)
-        root.add(item_1_high, categoriesHolder)
-        root.add(item_1_low, categoriesHolder)
-        root.add(item_1_low, categoriesHolder)
-        root.add(item_2_null, categoriesHolder)
+        val root: TreeNode<String, String> = TreeNode.root()
 
-        val map2 = root.toMap()
-        val json2 = Gson().toJson(map2)
-        println(json2)
+        assertNull(root.add(itemNullHigh, categoriesHolder))
+
+        assertNotNull(root.add(item0High, categoriesHolder))
+        assertNotNull(root.add(item0Low, categoriesHolder))
+        assertNotNull(root.add(item1High, categoriesHolder))
+        assertNotNull(root.add(item1Low, categoriesHolder))
+        assertNotNull(root.add(item1Low, categoriesHolder))
+        assertNotNull(root.add(item2Null, categoriesHolder))
     }
 }

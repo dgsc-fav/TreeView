@@ -11,29 +11,21 @@
  * ANY KIND, either express or implied. See the License for the specific language governing
  * permissions and limitations under.
  */
+package me.texy.treeview.base
 
-package me.texy.treeview.base;
-
-import android.view.View;
-
-import me.texy.treeview.TreeNode;
+import android.view.View
+import me.texy.treeview.TreeNode
 
 /**
  * Created by xinyuanzhong on 2017/4/27.
  */
-
-public abstract class CheckableNodeViewBinder<V, C> extends BaseNodeViewBinder {
-
-    public CheckableNodeViewBinder(View itemView) {
-        super(itemView);
-    }
-
+abstract class CheckableNodeViewBinder<V, C>(itemView: View) : BaseNodeViewBinder<V, C>(itemView) {
     /**
      * Get the checkable view id. MUST BE A Checkable type！
      *
      * @return
      */
-    public abstract int getCheckableViewId();
+    abstract val checkableViewId: Int
 
     /**
      * Do something when a node select or deselect（only triggered by clicked）
@@ -41,7 +33,6 @@ public abstract class CheckableNodeViewBinder<V, C> extends BaseNodeViewBinder {
      * @param treeNode
      * @param selected
      */
-    public void onNodeSelectedChanged(TreeNode<V, C> treeNode, boolean selected) {
-        /*empty*/
+    fun onNodeSelectedChanged(treeNode: TreeNode<V, C>?, selected: Boolean) { /*empty*/
     }
 }

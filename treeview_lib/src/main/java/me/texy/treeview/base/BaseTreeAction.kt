@@ -11,40 +11,26 @@
  * ANY KIND, either express or implied. See the License for the specific language governing
  * permissions and limitations under.
  */
+package me.texy.treeview.base
 
-package me.texy.treeview.base;
-
-import java.util.List;
-
-import me.texy.treeview.TreeNode;
+import me.texy.treeview.TreeNode
 
 /**
  * Created by xinyuanzhong on 2017/4/20.
  */
-
-public interface BaseTreeAction<V, C> {
-    void expandAll();
-
-    void expandNode(TreeNode<V, C> treeNode);
-
-    void expandLevel(int level);
-
-    void collapseAll();
-
-    void collapseNode(TreeNode<V, C> treeNode);
-
-    void collapseLevel(int level);
-
-    void toggleNode(TreeNode<V, C> treeNode);
-
-    void deleteNode(TreeNode<V, C> node);
-
-    void addNode(TreeNode<V, C> parent, TreeNode<V, C> treeNode);
-
-    List<TreeNode<V, C>> getAllNodes();
-
+interface BaseTreeAction<V, C> {
+    fun expandAll()
+    fun expandNode(treeNode: TreeNode<V, C>?)
+    fun expandLevel(level: Int)
+    fun collapseAll()
+    fun collapseNode(treeNode: TreeNode<V, C>?)
+    fun collapseLevel(level: Int)
+    fun toggleNode(treeNode: TreeNode<V, C>?)
+    fun deleteNode(node: TreeNode<V, C>?)
+    fun addNode(parent: TreeNode<V, C>?, treeNode: TreeNode<V, C>?)
     // TODO: 17/4/30
-    // 1.add node at position
-    // 2.add slide delete or other operations
+    val allNodes: List<TreeNode<V, C>?>?
 
+// 1.add node at position
+// 2.add slide delete or other operations
 }
